@@ -1,0 +1,77 @@
+select * from MONEQUIP.address;
+select * from MONEQUIP.CUSTOMER_TYPE;
+select * from MONEQUIP.EQUIPMENT;
+select * from MONEQUIP.CATEGORY;
+select * from MONEQUIP.CUstomer;
+select * from MONEQUIP.staff;
+select * from monequip.hire;
+select * from monequip.SALES;
+
+select * from MONEQUIP.HIRE h
+where h.EQUIPMENT_ID = 15;
+
+select * from MONEQUIP.HIRE h
+where h.EQUIPMENT_ID = 158;
+
+select * from MONEQUIP.sales s
+where s.EQUIPMENT_ID = 158;
+
+--customer_type duplicate values
+select CUSTOMER_TYPE_ID, count(*)
+from MONEQUIP.CUSTOMER_TYPE
+group by CUSTOMER_TYPE_ID
+having count(*) > 1;
+
+--customer duplicate values
+select CUSTOMER_ID, count(*)
+from MONEQUIP.CUSTOMER
+group by CUSTOMER_id
+having count(*) > 1;
+
+
+select distinct DESCRIPTION from MONEQUIP.CUSTOMER_TYPE;
+
+--customer_type table created
+create table customer_type AS
+select * from MONEQUIP.CUSTOMER_TYPE
+where DESCRIPTION = 'Business'
+or DESCRIPTION = 'Individual';
+
+select * from customer_type;
+
+--category table created
+
+create table CATEGORY AS
+select * from MONEQUIP.CATEGORY
+where category_DESCRIPTION != 'null';
+
+drop table category;
+select * from CATEGORY;
+
+--customer table created
+create table customers AS
+select distinct * from MONEQUIP.CUSTOMER
+order by CUSTOMER_ID asc;
+
+UPDATE customers
+SET gender = CASE
+    WHEN gender = 'M' THEN 'Male'
+    WHEN gender = 'F' THEN 'Female'
+    ELSE gender
+END;
+
+select * from CUSTOMERS;
+drop table customers;
+
+--
+create table hire AS
+select * from MONEQUIP.hire;
+
+select * from hire;
+-- Update total_hire_price with correct calculation
+UPDATE hire
+SET total_hire_price = 
+    CASE 
+        WHEN start_date = end_date THEN 0.5 * unit_hire_price*quantity
+        ELSE (end_date - start_date) * unit_hire_price * quantity
+    END;
