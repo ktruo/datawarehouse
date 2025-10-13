@@ -66,6 +66,13 @@ where EQUIPMENT_NAME = 'DRAIN CLEANER 6IN JETTER 4000PSI';
 select * from MONEQUIP.EQUIPMENT
 where CATEGORY_Id=15;
 
+--checking for relationship errors after deletion of category 15
+select * from MONEQUIP.SALES
+where SALES.EQUIPMENT_ID = 158;
+
+select * from MONEQUIP.HIRE
+where hire.EQUIPMENT_ID = 158;
+
 --create equipment table
 create table equipment as
 select * from MONEQUIP.EQUIPMENT
@@ -114,3 +121,49 @@ create table sales as
 select * from monequip.sales 
 WHERE quantity > 0;
 
+--create staff table
+create table staff as
+select * from monequip.staff;
+
+SELECT * FROM staff;
+
+--create address table
+create table address as
+SELECT * from MONEQUIP.address;
+
+select * from address;
+
+--create category dimension table
+drop table categorydim;
+create table categorydim as
+select * from category;
+select * from CATEGORYDIM;
+
+--create time dimension table
+drop table timedim;
+
+CREATE TABLE timedim (
+    timeID VARCHAR2(6), -- MMYYYY
+    month NUMBER(2),
+    year NUMBER(4),
+    season VARCHAR2(10)
+);
+
+-- Insert distinct time periods from hire.start_date
+INSERT INTO timedim(timeID, month, year, season)
+SELECT 
+    TO_CHAR(start_date, 'MMYYYY') AS timeID,
+    TO_CHAR(start_date, 'MM') AS month,
+    TO_CHAR(start_date, 'YYYY') AS year,
+    CASE 
+        WHEN TO_CHAR(start_date, 'MM') IN ('12', '01', '02') THEN 'Summer'
+        WHEN TO_CHAR(start_date, 'MM') IN ('03', '04', '05') THEN 'Autumn'
+        WHEN TO_CHAR(start_date, 'MM') IN ('06', '07', '08') THEN 'Winter'
+        WHEN TO_CHAR(start_date, 'MM') IN ('09', '10', '11') THEN 'Spring'
+        ELSE 'Unknown'
+    END AS season
+FROM (
+    SELECT DISTINCT start_date FROM hire
+);
+
+select distinct start_date from hire;
