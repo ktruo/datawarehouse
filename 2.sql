@@ -166,4 +166,14 @@ FROM (
     SELECT DISTINCT start_date FROM hire
 );
 
-select distinct start_date from hire;
+--create branch dimension table
+drop table branchdim;
+create table branchdim as
+select distinct company_branch from staff;
+select * from branchdim;
+
+--create customertypedim table
+create table customertypedim as
+select * from customer_type;
+select * from customertypedim;
+
