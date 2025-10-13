@@ -36,9 +36,9 @@ select
     timeid,
     COMPANY_BRANCH,
     CUSTOMER_TYPE_ID,
-    sum(tOTAL_HIRE_PRICE) as TOTAL_HIRE_PRICE,
+    sum(tOTAL_HIRE_PRICE) as TOTAL_HIRE_Revenue,
     sum(QUANTITY) as TOTAL_QUANTITY,
-    count(*) as TOTAL_TRANSACTIONS
+    count(*) as TOTAL_HIRE_TRANSACTIONS
 from temphirefact
 GROUP BY
     CATEGORY_ID,
@@ -46,14 +46,15 @@ GROUP BY
     COMPANY_BRANCH,
     CUSTOMER_TYPE_ID;
 
+DROP TABLE hirefact;
 select * from hirefact;
 
 --aggregate hire fact by season
 SELECT 
     timedim.SEASON,
-    SUM(TOTAL_HIRE_PRICE) AS TOTAL_HIRE_PRICE,
+    SUM(TOTAL_HIRE_revenuE) AS TOTAL_HIRE_Revenue,
     SUM(TOTAL_QUANTITY) AS TOTAL_QUANTITY,
-    SUM(TOTAL_TRANSACTIONS) AS TOTAL_TRANSACTIONS
+    SUM(TOTAL_HIRE_TRANSACTIONS) AS TOTAL_TRANSACTIONS
 from 
     hirefact,
     timedim
