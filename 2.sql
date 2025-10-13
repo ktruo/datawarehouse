@@ -121,6 +121,10 @@ create table sales as
 select * from monequip.sales 
 WHERE quantity > 0;
 
+DELETE FROM sales
+WHERE sales_date < DATE '2018-04-01'
+    OR sales_date > DATE '2020-12-31';
+
 --create staff table
 create table staff as
 select * from monequip.staff;
@@ -165,6 +169,32 @@ SELECT
 FROM (
     SELECT DISTINCT start_date FROM hire
 );
+select * from timedim;
+
+-- Insert all sales_date values into timedim (may create duplicates)
+INSERT INTO timedim (timeID, month, year, season)
+SELECT 
+    TO_CHAR(sales_date, 'MMYYYY') AS timeID,
+    TO_CHAR(sales_date, 'MM') AS month,
+    TO_CHAR(sales_date, 'YYYY') AS year,
+    CASE 
+        WHEN TO_CHAR(sales_date, 'MM') IN ('12', '01', '02') THEN 'Summer'
+        WHEN TO_CHAR(sales_date, 'MM') IN ('03', '04', '05') THEN 'Autumn'
+        WHEN TO_CHAR(sales_date, 'MM') IN ('06', '07', '08') THEN 'Winter'
+        WHEN TO_CHAR(sales_date, 'MM') IN ('09', '10', '11') THEN 'Spring'
+        ELSE 'Unknown'
+    END AS season
+FROM (
+    SELECT DISTINCT sales_date FROM sales
+    WHERE sales_date IS NOT NULL
+);
+
+-- Remove duplicates: recreate timedim with only distinct rows
+CREATE TABLE timedim_distinct AS
+SELECT DISTINCT * FROM timedim;
+DROP TABLE timedim;
+ALTER TABLE timedim_distinct RENAME TO timedim;
+
 
 --create branch dimension table
 drop table branchdim;
@@ -177,3 +207,4 @@ create table customertypedim as
 select * from customer_type;
 select * from customertypedim;
 
+select * from sales;
