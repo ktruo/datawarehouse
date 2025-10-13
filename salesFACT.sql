@@ -94,6 +94,7 @@ WHERE
 group BY
     scaledim.SCALE;
 
+--check salesfact table structure
 SELECT column_name, data_type, data_length, nullable
 FROM user_tab_columns
-WHERE table_name = 'salesfact';
+WHERE table_name = 'SALESFACT';
