@@ -63,3 +63,17 @@ WHERE
 group BY
     timedim.SEASON;
 
+SELECT 
+    branchdim.COMPANY_BRANCH,
+    SUM(TOTAL_HIRE_revenuE) AS TOTAL_HIRE_Revenue,
+    SUM(TOTAL_QUANTITY) AS TOTAL_QUANTITY,
+    SUM(TOTAL_HIRE_TRANSACTIONS) AS TOTAL_TRANSACTIONS
+from 
+    hirefact,
+    branchdim
+WHERE
+    hirefact.COMPANY_BRANCH = branchdim.COMPANY_BRANCH
+and branchdim.COMPANY_BRANCH = 'Pakenham'
+GROUP BY
+    branchdim.COMPANY_BRANCH;
+

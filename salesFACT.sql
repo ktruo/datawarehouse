@@ -98,3 +98,33 @@ group BY
 SELECT column_name, data_type, data_length, nullable
 FROM user_tab_columns
 WHERE table_name = 'SALESFACT';
+
+--check hirefact table structure
+SELECT column_name, data_type, data_length, nullable
+FROM user_tab_columns
+WHERE table_name = 'HIREFACT';
+
+--check scaledim table structure
+SELECT column_name, data_type, data_length, nullable
+FROM user_tab_columns
+WHERE table_name = 'SCALEDIM';
+
+--check categorydim table structure
+SELECT column_name, data_type, data_length, nullable
+FROM user_tab_columns
+WHERE table_name = 'CATEGORYDIM';
+
+--check timedim table structure
+SELECT column_name, data_type, data_length, nullable
+FROM user_tab_columns
+WHERE table_name = 'TIMEDIM';
+
+--check branchdim table structure
+SELECT column_name, data_type, data_length, nullable
+FROM user_tab_columns
+WHERE table_name = 'BRANCHDIM';
+
+--check customerdim table structure
+SELECT column_name, data_type, data_length, nullable
+FROM user_tab_columns
+WHERE table_name = 'CUSTOMERTYPEDIM';
