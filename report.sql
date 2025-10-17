@@ -148,8 +148,7 @@ SELECT
     timedim.YEAR,
     SUM(TOTAL_HIRE_revenuE) AS TOTAL_HIRE_Revenue,
     SUM(TOTAL_HIRE_TRANSACTIONS) AS TOTAL_TRANSACTIONS,
-    SUM(TOTAL_HIRE_revenuE)/SUM(TOTAL_HIRE_TRANSACTIONS) AS AVG_HIRE_REVENUE_PER_TXN
-
+    ROUND(SUM(TOTAL_HIRE_revenuE)/SUM(TOTAL_HIRE_TRANSACTIONS), 2) AS AVG_HIRE_REVENUE_PER_TXN
 from 
     hirefact,
     timedim
@@ -158,6 +157,88 @@ WHERE
 group BY
     timedim.SEASON,
     timedim.YEAR
-    ORDER BY timedim.YEAR, timedim.SEASON;
+ORDER BY 
+    timedim.YEAR,
+    CASE timedim.SEASON 
+        WHEN 'Summer' THEN 1
+        WHEN 'Autumn' THEN 2
+        WHEN 'Winter' THEN 3
+        WHEN 'Spring' THEN 4
+    END;
 
 select * from hirefact;
+select * from TIMEDIM;
+
+WITH season_map AS (
+  SELECT
+    timedim.SEASON,
+    timedim.YEAR,
+    SUM(TOTAL_HIRE_revenuE) AS TOTAL_HIRE_Revenue,
+    -- Map season to a number
+    (timedim.YEAR * 10) +
+      CASE timedim.SEASON
+        WHEN 'Summer' THEN 1
+        WHEN 'Autumn' THEN 2
+        WHEN 'Winter' THEN 3
+        WHEN 'Spring' THEN 4
+      END AS seasonyear
+  FROM hirefact, timedim
+  WHERE hirefact.timeid = timedim.timeid
+  GROUP BY timedim.SEASON, timedim.YEAR
+),
+regression AS (
+  SELECT
+    REGR_SLOPE(TOTAL_HIRE_Revenue, seasonyear) AS slope,
+    REGR_INTERCEPT(TOTAL_HIRE_Revenue, seasonyear) AS intercept
+  FROM season_map
+)
+SELECT
+  s.SEASON,
+  s.YEAR,
+  s.TOTAL_HIRE_Revenue,
+  ROUND(r.slope * s.seasonyear + r.intercept, 2) AS predicted_hire_revenue
+FROM season_map s, regression r
+ORDER BY s.YEAR, s.SEASON;
+
+--group salesfact by scale and customer type
+SELECT
+CUSTOMERtypedim.description as customer_type,
+ SCALE,
+ SUM(TOTAL_SALES_REVENUE) AS TOTAL_SALES_REVENUE,
+ SUM(TOTAL_SALE_TRANSACTIONS) AS TOTAL_SALES_TRANSACTIONS,
+CASE WHEN SUM(TOTAL_SALE_TRANSACTIONS) > 0
+ THEN ROUND(SUM(TOTAL_SALES_REVENUE) / SUM(TOTAL_SALE_TRANSACTIONS), 2)
+    ELSE 0
+END AS AVG_SALES_REVENUE_PER_TXN
+FROM salesfact, customertypedim
+WHERE salesfact.CUSTOMER_TYPE_ID = customertypedim.CUSTOMER_TYPE_ID
+GROUP BY
+ CUSTOMERtypedim.description,
+ SCALE
+ORDER BY TOTAL_SALES_REVENUE DESC;
+
+select * from SALESFACT;
+
+--group salesfact by season and year
+SELECT 
+    timedim.SEASON,
+    timedim.YEAR,
+    SUM(TOTAL_SALES_REVENUE) AS TOTAL_SALES_Revenue,
+    SUM(TOTAL_SALE_TRANSACTIONS) AS TOTAL_TRANSACTIONS,
+    ROUND(SUM(TOTAL_SALES_REVENUE)/SUM(TOTAL_SALE_TRANSACTIONS), 2) AS AVG_SALES_REVENUE_PER_TXN
+from 
+    salesfact,
+    timedim
+WHERE
+    salesfact.timeid = timedim.timeid
+group BY
+    timedim.SEASON,
+    timedim.YEAR
+ORDER BY 
+    timedim.YEAR,
+    CASE timedim.SEASON 
+        WHEN 'Summer' THEN 1
+        WHEN 'Autumn' THEN 2
+        WHEN 'Winter' THEN 3
+        WHEN 'Spring' THEN 4
+    END;
